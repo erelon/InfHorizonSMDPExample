@@ -1,0 +1,37 @@
+FIGURE 2 summary
+arm                       rew A       rew C       rew D       sigma A     sigma C     sigma D     press A     press C     press D     floor% A    floor% C    floor% D    recovery (per seed)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+frozen dose               0.804       0.610       0.783       0.181       0.179       0.180       1.368       1.357       1.372       0           0           0           med 200 [200,200,200,200,200]
+tracked, no floor         0.921       0.754       0.928       0.048       0.020       0.018       1.095       0.864       0.807       0           0           0           med 200 [200,200,200,200,200]
+tracked + floor           0.907       0.726       0.899       0.076       0.075       0.075       1.368       1.417       1.419       74          100         100         med 200 [200,200,200,200,200]
+tracked + floor + boost   0.907       0.726       0.899       0.076       0.075       0.075       1.368       1.417       1.419       74          100         100         med 200 [200,200,200,200,200]
+
+boost arm: starving iterations in [2000, 6000) per seed = [0, 0, 0, 0, 0]; first fire after t = 6000: ['never', 'never', 'never', 'never', 'never']; boost max after it: [1.0, 1.0, 1.0, 1.0, 1.0]
+boost < 1.3 after the relax completes (t = 12000): ['0', '0', '0', '0', '0'] iters
+ideal reward: 0.952 in A, 0.735 during the k = 0.6 hold. Recovery = iterations after t = 6000 until the trailing 200-iter mean reward (window entirely after 6000) exceeds 0.9 x its mean over [5000, 6000); must happen inside C (< 11000).
+
+EPILOGUE (swap world, boost arm only, 8000 iters, swap at 4000)
+arm                       rew before swaprew after swapsigma before swapsigma after swappress before swappress after swapfloor% before swapfloor% after swaprecovery (per seed)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+tracked + floor + boost   0.899       0.522       0.076       0.100       1.343       1.436       61          100         med never [never,never,never,never,never]
+
+boost arm: starving iterations in [2000, 4000) per seed = [0, 0, 0, 0, 0]; first fire after t = 4000: ['never', 'never', 'never', 'never', 'never']; boost max after it: [1.0, 1.0, 1.0, 1.0, 1.0]
+
+Acceptance criteria (tags: orig = brief as written, adapted = brief criterion re-anchored to the amended schedule, revised = changed by amendment 1, new = introduced by amendment 1, new2 = introduced by amendment 2)
+[FAIL] [new2] A: all four arms identical within noise: median sigma [4000,6000): frozen dose 0.181, tracked, no floor 0.031, tracked + floor 0.075, tracked + floor + boost 0.075 (spread 490%)
+[PASS] [new2] A: trigger silent after t = 2000: starving iterations in [2000,6000) per seed = [0, 0, 0, 0, 0]
+[FAIL] [new2] C: frozen dose crushed (sigma_C / sigma_A <= 0.6; spec premise ~ 1/sqrt(6) = 0.41): measured 0.180/0.181 = 0.99; balance predicts 0.171/0.180 = 0.95
+[FAIL] [new2] C: tracked + floor crushed (sigma_C / sigma_A <= 0.6; spec premise ~ 1/sqrt(6) = 0.41): measured 0.075/0.075 = 0.99; balance predicts 0.074/0.075 = 0.99
+[FAIL] [new2] C: no-floor arm strictly worse than frozen (mean reward in C): tracked, no floor 0.754 vs frozen 0.610
+[FAIL] [new2] C: boost fires within 500 iters of t = 6000: first fire per seed = ['never', 'never', 'never', 'never', 'never']
+[PASS] [new2] C: boost arm sigma within 25% of its boosted balance: measured 0.075 vs predicted 0.074
+[FAIL] [new2] C: boost recovers >= 3x faster than every other arm: median recovery: boost 200; frozen dose 200, tracked, no floor 200, tracked + floor 200
+[PASS] [new2] D: boost < 1.3 within 3000 iters of the relax completing: per seed = ['0', '0', '0', '0', '0']
+[PASS] [new2] D: boost arm ends indistinguishable from tracked + floor: median sigma [15000,16000): boost 0.075, tracked + floor 0.075
+[FAIL] [new2] D: all arms reconverge (late-D sigma within 15% of phase A): frozen dose 1.00, tracked, no floor 0.60, tracked + floor 1.00, tracked + floor + boost 1.00
+[PASS] [orig] sigma never exceeds 3 in any arm: max sigma = 0.300
+[info] tracked + floor: floor binds in 74% of A, 100% of C, 100% of D
+[info] tracked + floor + boost: floor binds in 74% of A, 100% of C, 100% of D
+[PASS] [new2] epilogue: trigger silent after settling (trapped policy looks healthy): starving iterations in [2000, 8000) per seed = [0, 0, 0, 0, 0]
+[PASS] [new2] epilogue: reward stays stuck after the swap: recovery per seed = ['never', 'never', 'never', 'never', 'never']
+7 failing.

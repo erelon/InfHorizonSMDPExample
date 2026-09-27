@@ -1,0 +1,37 @@
+FIGURE 2 summary
+arm                       rew A       rew D0-2k   rew D2k-end sigma A     sigma D0-2k sigma D2k-endpress A     press D0-2k press D2k-endfloor% A    floor% D0-2kfloor% D2k-endrecovery (per seed)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+frozen dose               0.846       0.104       0.792       0.179       1.660       0.180       1.349       0.718       1.348       0           0           0           med 2320 [2239,1949,2320,3109,2647]
+tracked, no floor         0.959       0.091       0.930       0.055       0.165       0.053       0.840       0.812       0.813       0           0           0           med 1988 [1988,1989,1988,1984,2003]
+tracked + warmup floor    0.846       0.049       0.056       0.179       1.884       1.912       1.349       0.780       0.799       100         35          0           med never [never,never,never,never,never]
+tracked, no floor + boost 0.943       0.424       0.898       0.085       0.177       0.099       1.196       1.183       1.292       0           0           0           med 1295 [1295,1298,1343,1276,1277]
+
+boost arm: starving iterations in [2000, 6000) per seed = [3764, 4008, 4017, 3802, 3885]; first fire after t = 6000: ['0', '0', '0', '0', '0']; boost max between event and recovery: [1.5, 1.57, 1.72, 1.5, 1.47]
+constants (solved from I1-I4, see fig2_preregistration_amendment5.md): M = 250, t_ref = 300, B_max = 4, c = 1.6, no skirt
+boost arm reference 0.2044, threshold 0.0613, noise eta 0.03; regulated band on the bump: sigma 0.0824, boost 1.542; flat widths: frozen 2.38, no-floor 0.853, boost (trigger-limited) 1.375; acquisition ceiling 1.957
+Recovery = iterations after t = 6000 until the trailing 200-iter mean reward (window entirely post-event) exceeds 0.8 x post-event ideal 0.949 = 0.759.
+
+EPILOGUE (swap world, boost arm only, 8000 iters, swap at 4000)
+arm                       rew before swaprew after swapsigma before swapsigma after swappress before swappress after swapfloor% before swapfloor% after swaprecovery (per seed)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+tracked + floor + boost   0.899       0.522       0.076       0.100       1.343       1.436       61          100         med never [never,never,never,never,never]
+
+boost arm: starving iterations in [2000, 4000) per seed = [0, 0, 0, 0, 0]; first fire after t = 4000: ['never', 'never', 'never', 'never', 'never']; boost max between event and recovery: [1.0, 1.0, 1.0, 1.0, 1.0]
+
+Acceptance criteria (tags: orig = brief as written, adapted = brief criterion re-anchored to the amended schedule, revised = changed by amendment 1, new = introduced by amendment 1, new2 = introduced by amendment 2, new3 = introduced by amendment 3, new4 = introduced by amendment 4, new5 = introduced by amendment 5)
+[PASS] [new5] I1: boost-arm reference taken while healthy (>= 0.15): reference per seed = [0.2012, 0.1968, 0.2044, 0.2096, 0.2063]
+[PASS] [new5] I2: unaided no-floor collapse holds its EMA below the threshold until the event: per seed = [True, True, True, True, True]; settled no-floor std(A) 0.0363 vs threshold 0.0613
+[PASS] [new5] A: frozen and warmup-floor arms identical and silent: median sigma 0.1790 / 0.1790; starving iterations 0 / 0
+[FAIL] [new5] A: boost arm fires at the predicted t = 1923 +- 300: first fire per seed = [1401, 1418, 1383, 1381, 1391] (median 1391)
+[PASS] [new5] A: boost arm regulated in the predicted band (I4: sigma and boost within 25%): sigma 0.0863 vs 0.0824; boost 1.587 vs 1.542
+[PASS] [new4] A: unaided no-floor arm at the noise-rescued width: 0.0525 vs 0.0511
+[PASS] [new5] event: reward crashes in every arm (< 0.2 over the first 100 iters): frozen dose -0.010, tracked, no floor -0.008, tracked + warmup floor -0.010, tracked, no floor + boost -0.008
+[FAIL] [new5] recovery: boost arm >= 3x faster than the unaided no-floor arm (PREDICTED TO FAIL: 1.4-2.0): no-floor 1988 [1988, 1989, 1988, 1984, 2003] vs boost 1295 [1295, 1298, 1343, 1276, 1277] -> ratio 1.54
+[PASS] [new5] recovery: speed ratio inside the pre-registered 1.4-2.0 prediction: ratio 1.54
+[PASS] [new5] recovery: boost arm faster than any well-dosed arm that recovers at all: frozen dose ['2239', '1949', '2320', '3109', '2647']; tracked + warmup floor ['never', 'never', 'never', 'never', 'never']
+[FAIL] [new5] recovery: well-dosed arms stall at the ceiling (median late mu < c - 0.3): frozen dose mu 1.59, tracked + warmup floor mu 0.77 (c = 1.6)
+[PASS] [orig] sigma <= 3 throughout, every arm: frozen dose 2.16, tracked, no floor 0.72, tracked + warmup floor 2.16, tracked, no floor + boost 1.16
+[PASS] [new5] I4: after re-acquisition the boost arm returns to the regulated band (predicted: regulation): last 4000 iters: sigma 0.1007 vs 0.0824; boost 1.679 vs 1.542
+[PASS] [new2] epilogue: trigger silent after settling (trapped policy looks healthy): starving iterations in [2000, 8000) per seed = [0, 0, 0, 0, 0]
+[PASS] [new2] epilogue: reward stays stuck after the swap: recovery per seed = ['never', 'never', 'never', 'never', 'never']
+3 failing.
