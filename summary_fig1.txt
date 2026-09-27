@@ -1,0 +1,26 @@
+FIGURE 1 summary
+arm           perf A       perf B ramp  perf B hold  press A       press B ramp  press B hold  sigma A       sigma B ramp  sigma B hold  
+-----------------------------------------------------------------------------------------------------------------------------------------
+no fixes      -1.067       -0.746       -0.836       0.008         0.003         0.001         0.028         0.030         0.031         
+frozen dose   0.851        0.767        0.782        0.128         0.053         0.030         0.231         0.161         0.133         
+tracked dose  0.819        0.653        0.596        0.193         0.183         0.217         0.303         0.377         0.450         
+
+perf = 1 - mean(min((a-g)^2,4)) (= (mean r - ramp)/m: current-phase units); press = median realised pressure c_H/std(A) (searched 0.2).
+Windows: A [0,4000)  B ramp [4000,9000) m: 1->5  B hold [9000,12000) m = 5.  No event in figure 1, so no recovery metric.
+
+Acceptance criteria (tags: orig = brief as written, adapted = brief criterion re-anchored to the amended schedule, revised = changed by amendment 1, new = introduced by amendment 1, new2 = introduced by amendment 2)
+[PASS] [orig] no fixes dead by t ~ 2000 (perf < -1): first t where 100-iter mean of median perf < -1: 342
+[PASS] [orig] no fixes: b on its prediction (within noise band): phase A: 96.1% of iterations within the 2-sd band; bias = 0.00% of mean |b|
+[PASS] [orig] no fixes: phi unbounded: |phi(end)| per seed = [19208, 28930, 31695, 29306, 33208]
+[PASS] [orig] no fixes: phi on its integrator line: median |phi / cumsum(b_pred) - 1| at end = 0.23%
+[PASS] [orig] frozen dose: phi on its integrator line: median |phi / cumsum(b_pred) - 1| at end = 0.23%
+[PASS] [orig] tracked dose: phi on its integrator line: median |phi / cumsum(b_pred) - 1| at end = 0.10%
+[PASS] [orig] frozen dose: after centring the policy sees mean 0 exactly: max |mean(A_used)| = 9.3e-15
+[PASS] [orig] tracked dose: after centring the policy sees mean 0 exactly: max |mean(A_used)| = 8.0e-15
+[PASS] [adapted] frozen dose: realised pressure at end of ramp <= 0.06 (was: 'at C'; no C in fig 1): median over [8800,9000) = 0.0294 (6.8x under-delivery)
+[PASS] [revised] tracked dose: pressure within 30% of 0.2 over A-B except [4000,4400): worst 200-iter-mean deviation = 19.1%
+[PASS] [revised] tracked dose: pressure within 15% of 0.2 during the m = 5 hold: worst 200-iter-mean deviation in [9200,12000) = 11.8%
+[FAIL] [orig] frozen dose: sigma plateau within 25% of balance: measured/predicted: A 1.04, ramp end 1.31, hold 1.32
+[PASS] [orig] tracked dose: sigma plateau within 25% of balance: measured/predicted: A 1.07, ramp end 1.17, hold 1.16
+Moved to figure 2 by amendment 1: all recovery-after-C and boost criteria.
+1 failing.

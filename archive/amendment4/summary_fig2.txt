@@ -1,0 +1,40 @@
+FIGURE 2 summary
+arm                       rew A       rew D0-1.5k rew D1.5k-endsigma A     sigma D0-1.5ksigma D1.5k-endpress A     press D0-1.5kpress D1.5k-endfloor% A    floor% D0-1.5kfloor% D1.5k-endrecovery (per seed)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+frozen dose               0.846       0.014       0.157       0.180       2.033       1.759       1.348       0.780       0.736       0           0           0           med never [never,4311,never,never,never]
+tracked, no floor         0.949       -0.002      0.787       0.065       0.142       0.059       0.930       0.841       0.843       0           0           0           med 2636 [2618,2643,2636,2635,2639]
+tracked + warmup floor    0.846       0.014       0.030       0.180       2.033       2.019       1.348       0.783       0.797       100         81          0           med never [never,never,never,never,never]
+tracked + floor + boost   0.846       0.014       0.030       0.180       2.033       2.019       1.348       0.783       0.797       100         81          0           med never [never,never,never,never,never]
+
+boost arm: starving iterations in [2000, 5000) per seed = [0, 0, 0, 0, 0]; first fire after t = 5000: ['never', 'never', 'never', 'never', 'never']; boost max between event and recovery: [1.0, 1.0, 1.0, 1.0, 1.0]
+boost < 1.3 after recovery: ['never', 'never', 'never', 'never', 'never'] iters
+load-bearing arithmetic: eta = 0.030 < threshold 0.3 x reference = 0.3 x 0.1626 = 0.0488; but an EMA of memory 400 needs >= 782 iters to fall from the reference to the threshold even if std(A) dropped to eta instantly.
+Recovery = iterations after t = 5000 until the trailing 200-iter mean reward (window entirely post-event) exceeds 0.8 x post-event ideal 0.920 = 0.736.
+
+EPILOGUE (swap world, boost arm only, 8000 iters, swap at 4000)
+arm                       rew before swaprew after swapsigma before swapsigma after swappress before swappress after swapfloor% before swapfloor% after swaprecovery (per seed)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+tracked + floor + boost   0.899       0.522       0.076       0.100       1.343       1.436       61          100         med never [never,never,never,never,never]
+
+boost arm: starving iterations in [2000, 4000) per seed = [0, 0, 0, 0, 0]; first fire after t = 4000: ['never', 'never', 'never', 'never', 'never']; boost max between event and recovery: [1.0, 1.0, 1.0, 1.0, 1.0]
+
+Acceptance criteria (tags: orig = brief as written, adapted = brief criterion re-anchored to the amended schedule, revised = changed by amendment 1, new = introduced by amendment 1, new2 = introduced by amendment 2, new3 = introduced by amendment 3, new4 = introduced by amendment 4)
+[preflight] best mu at the fixed-dose flat width 2.38 for the bump at 2.0: 0.93 (criterion: within 0.3). FAILED for every c in [0.4, 2.0]: the smeared bump's curvature ~ w/sigma^3 is below the quadratic's 2k whenever sigma > (w/2k)^(1/3) = 1.96, so c was left at the specified 2.0.
+[PASS] [new4] A: arms 1, 3, 4 identical within noise: median sigma [3000,5000): frozen dose 0.179, tracked + warmup floor 0.179, tracked + floor + boost 0.179 (spread 0%)
+[PASS] [new4] A: trigger silent on the boost arm after t = 2000: starving iterations in [2000,5000) per seed = [0, 0, 0, 0, 0]
+[PASS] [new4] A: no-floor arm settles at the noise-rescued width ~0.051, not the clamp: median sigma [3000,5000) = 0.0549 vs predicted 0.0511 (clamp 0.0183)
+[info] no-floor c_H(EMA)/kappa over [3000,5000) = 0.970 (1 = balance; noise-free law would give p/sqrt(2) = 0.566)
+[PASS] [new4] A: settled pressure matches c_H / sqrt(eta^2 + (c_H/sqrt2)^2): frozen dose measured 1.354 vs predicted 1.390 (deterministic pin sqrt(2) = 1.414)
+[info] event arithmetic (measured): std(A) just after event 0.0318 (eta 0.03); settled reference 0.1688 (pred 0.1626); threshold 0.0507; slow-EMA minimum after event 0.1264
+[PASS] [new4] event: reward crashes in every arm (< 0.2 over the first 100 iters): frozen dose -0.010, tracked, no floor -0.008, tracked + warmup floor -0.010, tracked + floor + boost -0.010
+[FAIL] [new4] event: boost arm starving within 300 iters: first fire per seed = ['never', 'never', 'never', 'never', 'never']
+[FAIL] [new4] event: boost >= 3 during escape (spec: up to ~8): max boost between event and recovery per seed = [1.0, 1.0, 1.0, 1.0, 1.0]
+[PASS] [orig] sigma <= 3 throughout, every arm: frozen dose 2.37, tracked, no floor 1.19, tracked + warmup floor 2.37, tracked + floor + boost 2.37
+[FAIL] [new4] recovery: boost arm recovers: median never
+[FAIL] [new4] recovery: boost >= 3x faster than frozen dose: frozen dose never vs boost never (ratio nan)
+[FAIL] [new4] recovery: boost >= 3x faster than tracked + warmup floor: tracked + warmup floor never vs boost never (ratio nan)
+[info] no-floor recovery (predicted finite, slowest): median 2636 [2618, 2643, 2636, 2635, 2639]
+[FAIL] [new4] boost < 1.3 within 3000 iters of recovery: per seed = ['never', 'never', 'never', 'never', 'never']
+[PASS] [new2] epilogue: trigger silent after settling (trapped policy looks healthy): starving iterations in [2000, 8000) per seed = [0, 0, 0, 0, 0]
+[PASS] [new2] epilogue: reward stays stuck after the swap: recovery per seed = ['never', 'never', 'never', 'never', 'never']
+6 failing.
